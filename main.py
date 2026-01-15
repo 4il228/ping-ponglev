@@ -5,7 +5,7 @@ game = True
 finish = False
 timer = time.Clock()
 color_fon = (135, 206, 250)
-
+display.set_caption('Ping-pong')
 class GameSprite(sprite.Sprite):
     def __init__(self, player_img, player_x, player_y, player_speed, wight, height):
         super().__init__()
@@ -39,7 +39,13 @@ class Ball(GameSprite):
             self.player_speed_y *= -1
         if self.rect.colliderect(pl_1.rect) or self.rect.colliderect(pl_2.rect):
             self.speed *= -1
-        
+
+font.init()
+my_font = font.Font(None, 80)
+left_win_label = my_font.render('Left wins!', True, (255, 255, 255))
+right_win_label = my_font.render('Right wins!', True, (255, 255, 255))
+
+
 pl_l = Platform('player-left.png', 10, 300, 5, 30, 200, K_w, K_s)
 pl_r = Platform('player-right.png', 860, 300, 5, 30, 200, K_UP, K_DOWN) 
 ball = Ball('ball.png', 400, 350, 3, 100, 100) 
@@ -48,11 +54,18 @@ while game:
     for e in event.get():
         if e.type == QUIT:
             game = False
-    pl_l.update()
-    pl_r.update()
-    ball.update(pl_l, pl_r)
+    if not finish:
+        pl_l.update()
+        pl_r.update()
+        ball.update(pl_l, pl_r)
     pl_l.reset()
     pl_r.reset()
     ball.reset()
+    if ball.rect.x < 0 - ball.rect.width:
+        finish = True
+        window.blit(right_win_label, (300, 350))
+    if ball.rect.x > 900:
+        finish = True
+        window.blit(left_win_label, (300, 350))
     display.update()
     timer.tick(60)
